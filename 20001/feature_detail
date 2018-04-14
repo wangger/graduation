@@ -1,0 +1,209 @@
+需要顾虑的问题：
+1.一门课有不同的学期，针对一个学期的数据进行单独预测
+2.提取term_id，对应的开始时间和结束时间，duration
+3.有用户的选课时间在课程结束时间之后，这个暂且不管？(关键是有相应的纪录和特征就行)
+
+！！！
+？？貌似merge的时候需要term_id，到时候还要drop掉这个(那个merge函数)
+
+user_tag_value的term_id和course_id貌似有点问题 ？？？谁在前
+
+course_id应该都是同一个
+
+
+!!!先选出指定term_id的那个dataframe，然后再去提取feature
+!!!#删除重复列(确保user_tag不叫'user_id'!!)
+???如何判断某一列是否有缺失值？
+
+time的缺失值先填充一把我记得？？？
+
+
+moc_rely和moc_comment的content貌似是废的？
+
+sum,size的话key是nan是不记录在内的吗？
+
+
+用户发帖被评论的总数？？？
+
+有些一言难尽啊(moc_mutual_evaluate_detail中的evaluate)
+
+
+
+特征及方法
+用户发帖情况：1.该时间段内用户发帖的次数
+            user_tag_value与moc_post需要都先选好term_id
+            table:user_tag_value与moc_post, 
+            left: user_id    right: poster_id   how = 'inner'
+            
+            ??一个moc_post表其实已经足够？？(但是连接之后可以不用处理poster_id中的缺失值问题吧)
+            删除有缺失值的列貌似也有点麻烦？
+            
+
+            feature(merge之后需要选中的列):
+            poster_id(groupby),post_time
+            
+            groupby method: size(有多少发帖记录即可)
+
+            2.该时间段内用户发帖内容的总长度等
+            moc_post需要先选好term_id
+            table: moc_post 与 moc_post_detail
+            left: id  right: id  how = 'inner'
+
+            feature(merge之后需要选中的列):
+            ？？poster_id有缺失值呢？？？(在sum或者size的时候不会被计算进去？？？)
+            poster_id(groupby), post_time,content
+
+
+            (需要用lamda把content中的内容数据inplace地变换为length,但首先要填补缺失值，变成‘’)
+
+            
+
+            groupby method: sum? 对content那一列求和
+
+            4.该时间段内该用户帖子的总浏览数(其实对应的不是该段时间了！但没有具体浏览数据了)
+            moc_post需要先选好term_id
+            table: moc_post
+
+            (count_browse的缺失值？？？)
+            feature(merge之后需要选中的列): 
+            poster_id(groupby),post_time,count_browse
+
+            groupby method: sum? 对count_browse那一列求和
+
+
+用户发帖互动情况：
+            3.该时间段内该用户帖子的总回复数
+            是否count_reply已足够？(这个是总数！没有按照时间间隔！)
+
+
+
+            #真正对应该段时间
+            moc_post与moc_reply需要都先选好term_id
+            table:moc_post moc_reply
+            left: id    right: post_id  how = 'inner'
+            
+            feature(merge之后需要选中的列): 
+            poster_id(groupby),reply_time
+
+            groupby method: size
+
+            ？？废
+            5.该时间段内该用户帖子的被回复内容的总长度等
+            moc_post与moc_reply需要都先选好term_id
+            table:moc_post moc_reply
+            left: id    right: post_id  how = 'inner'
+
+            (需要用lamda把content中的内容数据inplace地变换为length,但首先要填补缺失值，变成‘’)
+            feature(merge之后需要选中的列): 
+            poster_id(groupby),reply_time,content
+
+            groupby method: 对content那一列求和
+
+用户自主回复他人帖子的情况：
+            6.该时间段内该用户总回帖数
+            moc_post与moc_reply需要都先选好term_id
+            table:moc_post moc_reply
+            left: id    right: post_id  how = 'inner'
+
+            (需要用lamda把content中的内容数据inplace地变换为length,但首先要填补缺失值，变成‘’)
+            feature(merge之后需要选中的列): 
+            replyer_id(groupby),reply_time
+
+            groupby method: size
+
+            ？？废
+            7.该时间段内该用户帖子的回帖总长度
+            moc_post与moc_reply需要都先选好term_id
+            table:moc_post moc_reply
+            left: id    right: post_id  how = 'inner'
+
+            (需要用lamda把content中的内容数据inplace地变换为length,但首先要填补缺失值，变成‘’)
+            feature(merge之后需要选中的列): 
+            replyer_id(groupby),reply_time,content
+
+            groupby method: 对content那一列求和
+
+
+            ####8.该时间段内该用户帖子的回帖被评论的总数(和9重复了)
+            moc_post与moc_reply需要都先选好term_id
+            table:moc_post moc_reply
+            left: id    right: post_id  how = 'inner'
+
+            (count_comment的缺失值)
+            feature(merge之后需要选中的列): 
+            replyer_id(groupby),reply_time,count_comment
+
+            groupby method: 对count_comment那一列求和
+
+
+用户回帖被评论的情况：
+            9.该时间段内该用户回帖被评论的总数
+            moc_reply与moc_comment都需要先选好term_id
+
+            table:moc_reply moc_comment
+            left:id       right:reply_id          how = "inner"
+            
+            feature(merge之后需要选中的列): 
+            replyer_id(groupby),comment_time
+
+            groupby method:size
+
+            ?废
+            10.被评论内容的总长度等   
+
+
+
+用户发布评论的情况：
+            11.该时间段内用户发布评论的总数
+            moc_comment(选中term_id)
+            table:moc_comment
+            
+            feature(merge之后需要选中的列): 
+            commentor_id(groupby),comment_time
+
+            groupby method:size
+
+            #废
+            12.用户发布评论的总长度
+
+用户参与作业（test）互评的情况：
+            13.该时间段内参与作业互评的次数
+            moc_mutual_evaluate 与 moc_test(merge之后按照term_id挑选出dataframe)
+            left:test_id    right:id     how = 'inner'
+
+            table:moc_mutual_evaluate
+
+            feature:
+            evaluator_id(groupby),gmt_create
+
+            groupby method:size
+
+            #待定？？？
+            14.评价内容的总长度
+            moc_mutual_evaluate 与 moc_test(merge之后按照term_id挑选出dataframe)
+            left:test_id    right:id     how = 'inner'
+
+            table:moc_mutual_evaluate(之前merge好的) 与moc_mutaul_evaluate_detail合并
+            left:id    right:id        how = 'inner'
+
+            feature:
+            evaluator_id(groupby),gmt_create,evaluate
+
+            ???用户作业被评价内容总长度？
+
+
+
+            15.用户作业被评价的次数等
+            moc_mutual_evaluate 与 moc_test(merge之后按照term_id挑选出dataframe)
+            left:test_id    right:id     how = 'inner'
+
+            table:moc_mutual_evaluate
+
+            feature:
+            test_answerer_id(groupby),gmt_create            
+            groupby method:size
+
+用户浏览课程资源的情况：
+            16.用户在该时间段内观看视频的次数等。
+            wda???
+

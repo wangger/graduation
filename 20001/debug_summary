@@ -1,0 +1,283 @@
+算法思想：关于采用了对象，然后记录不同分类，然后计算时间！
+        第一次遍历记录了必要的信息，所以总体上减少了遍历的次数(再有四五个要算的时间的情况下，不分类的话一次只能算一种)
+
+
+debug总结：
+1.一个问题: first和last是什么意思
+    poster_id            post_time
+count         86                   86
+unique        74                   86
+top      4562077  2015-03-10 18:02:32
+freq           3                    1
+first        NaN  2015-03-09 10:22:34
+last         NaN  2015-03-16 23:57:18
+(然后并没有nan，无语)
+
+2.关于时间切片，应该+6还是+7呢？
+
+3.所有的分隔符都是'\x01'吗？(wda是‘\t’)
+
+4.series不能merge
+series和dataframe之辨！！ user_id强行加上brithday然后又pop
+只有dataframe之间才能merge！！！
+
+df[df[] == condicetion] 返回的都是dataframe，不会因为只有一个就变成series
+
+4.1但要注意reset
+
+！！！4.2返回是空的情况，集合是空的情况你有没有考虑到code是否还能正常运心？
+
+5.好像是没有注意term_id的问题！！！ 
+user_tag_value merge的时候应该限制term_id,发帖情况单独计算的时候在时间切片那一块有做学期的控制？
+
+发帖情况：
+3 7 3 2 5 2 3 3 4 13 
+1 1 0 0 1 1 2 1 1 3 (注册同学最大值，每周)
+3 7 3 2 5 2 3 3 4 13
+(发帖的同学是真的少！很多发的多的还不是注册用户，所以可能是老师)
+(也许这个结论有误，我自己搞的有点问题)
+(因为我没有完全读完user_tag_value，那块的缩进出了问题！！！)
+
+6.user_tag_value中可能会出现重复用户！！！(要指定term_id)
+
+7.缺失值系列
+user_tag_value中的缺失值是\N
+null,\N，-,NULL,''
+user_tag_value中的user_id应该不会有na吧？
+
+#缺失值（防止user_id中有缺失值）
+    full_user_id = full_user_id.replace(r'\N',np.nan)
+    full_user_id = full_user_id.replace('null',np.nan)
+    full_user_id['birthday'] = full_user_id['birthday'].replace(np.nan,'00000')
+    full_user_id = full_user_id.dropna()
+    dropna的 how 有any和all两种方法
+
+####moc_term里面总不至于还有一个缺失值吧（有的话从开始就gg了,一开始取的那些start_time这些总不能还有缺失吧？？？）
+
+8.term_id都是str吗？还是int？(wda.csv中没有它)
+
+9.读入应该全是str吧？除了wda.csv
+
+10.列名一样不能concat!!!可以的，语法搞错了！(而且不同于merge的是重复列名不自动改名，所以列索引可能会坑)
+    pd.concat[[a,b],axis = 1]
+        (错)[a,b, axis = 1] 
+    concat可以一次合并多个！
+    merge貌似一次只能merge两个？
+    join不太懂？！
+
+！！！[]这种语法！concat大法好，merge大法好
+
+11.pop大法好(直接inplace)
+   dropna大法好(需要指定inplace,要么赋值)
+
+12.区别？
+    reset_index 
+    set_index
+还有一个地方就是谁做索引，，，，，还有一个地方就是?
+
+13.由于没有大括号，缩进很坑
+(with open as 那个地方！！！！)
+
+14.关于时间戳数据的处理
+有一个处理是转成了毫秒
+week_data[time_tag] = week_data[time_tag].map(lambda x : x.timestamp())
+？？？填补缺失值时？(用13位还是10位？) 貌似用了10位？ 单位是毫秒？
+???deadline
+week_data[time_tag] = week_data[time_tag].map(lambda x : x.timestamp()) 由于日期变回timestamp之后的话，这个到底单位是秒吗？(已经不是13位了)
+
+
+
+15.填充的时间，转化的时间是否都满足10位数？(感觉test那里没有？？？/1000？ //1000)
+
+         total_time      uni_test      sub_test  avg_sub_test      max_time  \
+count  15824.000000  15824.000000  15824.000000  15824.000000  15824.000000   
+mean     356.958544      0.033557      0.054411      0.033382    186.310794   
+std     2264.127830      0.275754      0.498126      0.264488    824.878000   
+min    -5205.000000      0.000000      0.000000      0.000000      0.000000   
+25%        0.000000      0.000000      0.000000      0.000000      0.000000   
+50%        0.000000      0.000000      0.000000      0.000000      0.000000   
+75%        0.000000      0.000000      0.000000      0.000000      0.000000   
+max    66972.000000      9.000000     18.000000      8.000000   8560.000000   
+       total_video_time  total_other_time       avg_gap  
+count      15824.000000      15824.000000  1.582400e+04  
+mean         263.425367        134.369692  4.496293e+04  
+std         1480.435871        996.627933  3.098224e+05  
+min            0.000000          0.000000  0.000000e+00  
+25%            0.000000          0.000000  0.000000e+00  
+50%            0.000000          0.000000  0.000000e+00  
+75%            0.000000          0.000000  0.000000e+00  
+max        40575.000000      34125.000000  2.502614e+06  
+
+16.在time分割前有一个时间顺序，但是后续没有了
+   关于排序，尤其是计算时间？
+   每个用户userdata应该要排序？？？？（dataframe）
+   groupby之后的先后顺序？
+#时间数据在函数(timesplit)内有进行过排序？所以在计算特征的时候同一个actions里面的东西应该也是排序好了的？（添加顺序就是排序过的？）
+为什么有负值？
+
+17.同一个文件中如果要调用(运行)函数的话，这个函数的定义需要放在前面？！(python中没有函数声明一说？)
+   但是一个文件中只是定义各种类，各种函数的话，其实先后顺序没关系，写在同一个文件中或者import即可
+
+18.不同文件的耦合度？import之间的互相关系？？？(对import之类的理解还不够透彻)
+   文件之间的层次
+
+19.python中的变量生存周期，作用域等！
+
+20.弱类型的python尤其要注意类型检验？！！！(添加相关类型检验代码？)
+
+21.逻辑问题：时间的计算确实是有问题的，比如两次视频活动之间插入了作业，会被认为一直在看视频，因为分在了不同的action的记录中
+
+22.要先生成一个wda.csv
+
+23.用的url.1
+
+24.datafram.ix[-1]是错的！（因为没有值 = -1的行）
+   ??如何取dataframe的后几行呢？
+   head? tail？
+
+25.逻辑问题:feature label那里有点奇怪，变成了每周是否参加exam都有一个标签了（不考虑时间的话只要参加过一次就行了）
+    exam是每周都有的吗？？？？查看exam？
+
+26.不行的那种方法会造成重复列！！！
+#这个不行
+data = data.set_index(data[time_tag])
+#要这样
+data = data.set_index([time_tag])
+
+27.关于groupby
+    GroupBy对象支持迭代，可以产生一组二元元组（由分组名和数据块组成）。看看下面这个简单的数据集：
+
+    27.1 每个group都是一个二元元祖（由分组名和数据块组成，第一个元素是分组名，第二个元素是一个dataframe）
+    >>> for group in grouped:
+    ...     print(type(group))
+    ... 
+    <class 'tuple'>
+    <class 'tuple'>
+    证实了
+    >>> for group in grouped:
+    ...     print(type(group[0]))
+    ... 
+    <class 'str'>
+    <class 'str'>
+    >>> for group in grouped:
+    ...     print(type(group[1]))
+    ... 
+    <class 'pandas.core.frame.DataFrame'>
+    <class 'pandas.core.frame.DataFrame'>
+
+    >>> for group in grouped:
+    ...     print(group[1])
+    ... 
+            one              two  three four
+    0  0.557201   0.793781955386  100.0    a
+    1  0.296827  -0.103058242424  233.0    a
+    2  0.217862    1.23589104471   55.5    a
+            one              two           three four
+    3 -2.161757  -0.593934824788  123213231232.0    b
+    4 -0.979632     1.3119615936     343433433.0    b
+
+
+
+    27.2 tuple的一种使用方式：
+        >>> a , b = (1,2)
+        >>> a
+        1
+        >>> b
+        2 
+
+        >>> for name,group in grouped:
+        ...     print(type(name))
+        ...     print(type(group))
+        ... 
+        <class 'str'>
+        <class 'pandas.core.frame.DataFrame'>
+        <class 'str'>
+        <class 'pandas.core.frame.DataFrame'>
+        >>> for name,group in grouped:
+        ...     print(type(group))
+        ... 
+        <class 'pandas.core.frame.DataFrame'>
+        <class 'pandas.core.frame.DataFrame'>
+
+    27.3 group 的坑挺多，顺序是按照group列的字典顺序来排的，而index是沿用原来的，所以reset_index一番比较好
+
+28.出现鬼畜的uid？？？
+                            uid  
+0                           2228432   
+1                           5380077   
+2                           5697251   
+3                           5530166   
+4                           5530166   
+5                           5530166   
+6                           5530166   
+7                           5530166   
+8  63145271.342864503.1431274009000   
+9                           3589979   
+
+29.在定义类中的函数时，一定要把self作为参数！！！！！
+   使用init中的定义的属性时别忘了加self！！
+   self.type, self.content = self.get_wda_type()
+   调用自己的函数也是！！！
+   def get_wda_type(self):
+
+30. ‘xxx’ is not defined 对于这种要注意检查拼写，很有可能是xxx你写错了！
+    比如label和lable！！！
+
+31.创建dataframe时容易出的错！
+pd.DataFrame([['1003470', 0, 0, 0, 0, 0, 0, 0, 0]], columns = ['uid','total_time','uni_test','sub_test','avg_sub_test','max_time','total_video_time','total_other_time','avg_gap'])
+!!![[]]
+pd.DataFrame(['1003470', 0, 0, 0, 0, 0, 0, 0, 0], columns = ['uid','total_time','uni_test','sub_test','avg_sub_test','max_time','total_video_time','total_other_time','avg_gap'])
+[]默认给的是一列的数据！！！！(9行，1列)
+
+ValueError: Shape of passed values is (1, 9), indices imply (9, 9)
+
+！！！32.话说还没测试过这个问题呢！！！
+类型上的问题？
+uid                  object
+total_time          float64
+uni_test             object
+sub_test             object
+avg_sub_test         object
+max_time            float64
+total_video_time    float64
+total_other_time    float64
+avg_gap              object
+dtype: object
+
+uid      object
+label    object
+dtype: object
+(用int去创建dataframe时出了问题，可能因为一部分返回值是int,一部分是float所以只能用str了？)
+全变成float?
+
+33.test加上term_id
+
+34. 2和'2'的区别， 有些在抄的时候写错的东西！ sid/session   exam/test
+
+35.查看类型：
+    数据类型？
+    wda_extract_column = ['logtime','url.1','uid','sid']
+
+36.temp = test_list[(test_list['id'] == action.content) & (test_list['deadline'] > action.timestamp)]
+ temp是datafrme
+
+ 通过reset_index解决了这个问题
+ 例子:
+    >>> df[df['one'] < -2]
+            one              two           three four
+    3 -2.161757  -0.593934824788  123213231232.0    a
+    >>> type(df[df['one'] < -2])
+    <class 'pandas.core.frame.DataFrame'>
+    >>> mmm = df[df['one'] < -2]
+    >>> mmm
+            one              two           three four
+    3 -2.161757  -0.593934824788  123213231232.0    a
+
+37.计算时间那里用sort之后再看看情况
+
+38.*****************************************************************************
+总结！！！进行了各种条件选取之后都要进行re_index！！！！！
+条件选取，时间切片，groupby中取group！！！(获取列没事，获取行就不行了！！！)
+temp = temp.reset_index(drop = True)
+inplace=True 这种参数！！！
+*****************************************************************************

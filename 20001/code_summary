@@ -1,0 +1,148 @@
+关于代码文件的说明:
+1.data_test1.py
+2.data_test2.py
+3.data_test3.py
+4.data_test4.py
+5.data_test5.py
+6.data_test6.py
+7.data_test7.py
+8.data_test9.py
+9.write_wda.py
+10.feature_extraction_1.py
+11.f_extractor.py
+12.process_log.py
+13.log_feature_calculation.py
+14.log_extractor.py
+
+
+！！！wda的间隔符是'\t',不是'\x01'
+
+详细说明：
+1.data_test1.py
+  实验了读取文件（是文本文件，utf-8编码）的方法，找到了间隔符（\x01）
+
+  '\x01'是分隔符！！！(交互式环境中查看变量值而不是print才看得出不可打印字符！)
+  用‘／’用于文件路径，不是‘\\’
+
+2.data_test2.py
+#主要测试一下读取的速度
+#一门课总共100+m，此处先读去一个4.8m(需要循环)的试下，后续再读去一个100+m的
+#split()返回list（[]）
+#4.8m秒读的!
+
+#结果：用户记录数——55591(算了这个)
+
+3.data_test3.py
+ 测试了大文件的读取速度:
+ 看看python的时间函数的用法
+    time.clock() 单位是秒
+    time.time() 单位也是秒
+    datetime.seconds这个方法貌似四舍五入了？ 
+
+4.data_test4.py
+ 一种尝试吧，基本没用，采用了dict(),zip()这种函数
+
+5.data_test5.py
+主要是实现了两个函数：
+def get_dataframe(data,column_name):
+def read_data(f_path, f_name,delimiter):
+
+6.data_test6.py
+数据探索：
+       1.moc_reply 和 moc_comment中的content其实是没有的！
+       2.还是moc_reply
+       测试了get_dataframe，但是要注意这里的索引切片操作
+       print(data.ix[0:1,0:1])#前两行的第一列！！！（行包括1，列不包括1）很神奇的规定！！！！貌似又不对？
+       不是神奇，是因为行索引把0,1当作index名看，列索引当作数值看(因为列名不是0，1)
+
+       3.dataframe的几大描述函数
+         dtypes  info()  describe() 还有一个吗？
+       4. 查看wda_mooc中的具体情况，看类型
+          (不是wda.csv)
+       5.比较探索一下是否是按照降序排列的（wda本身）,答案不明？
+         sort_time = origin_time.sort_values(ascending = True)
+       6.处理了user_tag_value(缺失值之类的)
+         体会下面两个的不同！！！
+         print(user_infos.ix[0:10,'choose_time'])
+         #print(user_infos['choose_time'].head(10))
+         确认了有些uid会在user_tag_value里面出现
+
+7.datatest7.py
+数据探索：(都是一些基本盘的查看)
+     1.user_tag_value基本情况查看
+     2.moc_post
+     3.moc_post_detail
+     4.moc_reply
+     5.moc_comment 
+     6.moc_mutual_evaluate
+     7.moc_mutaul_evaluate_detail
+     8.moc_course
+     9.moc_term
+     10.moc_lesson
+     11.moc_lesson_uint
+     gmt_cre = datetime.fromtimestamp(int(info.ix[49,'gmt_create'])//1000)
+
+
+8.data_test9.py
+data = pd.read_csv('wda.csv',encoding = 'utf-8')
+data = data.sort_values(by = "logtime", ascending = True)
+
+9.write_wda.py
+其实这个文件才进行了一些深入的数据探索
+    1.moc_post和user_tag_value进行merge
+     test_miss = test_result_outer[test_result_outer['user_id'].isnull() == True]
+
+    2.info_post['term_id'].unique()
+    3.wda_data.to_csv('wda.csv',encoding = 'utf-8')
+      wda_data = pd.read_csv('wda.csv')
+
+      有一些黑科技：#np.savetxt(path, wda_data,fmt = '%s',delimiter=',',header= wda_col, encoding = 'utf-8')
+                  #wda_data = np.array(wda_data)
+
+10.feature_extraction_1.py
+定义了一系列函数，用于一般文件的特征提取
+def Valuefilling(data,process_column,source,target):
+
+def Timesplit(data,start_time,end_time,duration,time_tag,time_last = 7,time_process = True):
+def Usersplit_times(timeseries,usertag):
+def Userfeature_Process(user_feature, user_tag,term_id):
+
+def feature_concact(user_feature1,user_feature2):
+def week_concact(user_features):
+def get_listdata(user_data):
+def w_list_txt(list_data,filename):
+
+
+11.f_extractor.py
+在该文件中对一般的文件进行了特征提取(size大法)
+
+12.process_log.py
+<学会了对日志文件，采取类来存储属性这个方法！！！split逐条分析>
+定义了一些处理log文件的函数
+def Valuefilling(data,process_column,source,target):
+def log_Timesplit(data,start_time,end_time,duration,time_tag,time_last = 7,time_process = True):
+
+class Wda:
+    def __init__(self,user_series):
+    def get_wda_type(self):
+
+class User:
+    def __init__(self,user_group):
+    def get_wda_list(self,user_group):
+    def update(self,wda_info):
+    def generate_feature(self,test_list):
+
+def log_Usersplit_feature(log_data,usertag,term_id):
+def Userfeature_Process(user_log_feature, user_tag, term_id):
+
+def cal_time(actions):
+def unique_test(actions):
+def max_duration(actions):
+def cal_avg_interval_ddl(actions, test_list):
+
+
+13.log_feature_calculation.py
+已经废了，因为都转移到process_log.py中了，否则的话耦合度太高(模块间双向依赖)
+
+14.log_extractor.py
+在该文件中对日志文件进行了特征提取

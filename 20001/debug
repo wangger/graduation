@@ -1,0 +1,137 @@
+review时需要关注的bug
+
+all_actions那里按照时间顺序添加后就ok了！
+类型问题大法好！！！
+
+
+0.
+test加上term_id
+
+2和'2'的区别， 有些在抄的时候写错的东西！ sid/session   exam/test
+
+sort的问题
+数据类型的问题()
+
+reset_index!!尤其是出现了.ix[0]这种！！
+计算时间那里用sort之后再看看情况
+
+*****************************************************************************
+总结！！！进行了各种条件选取之后都要进行re_index！！！！！
+条件选取，时间切片，groupby中取group！！！(获取列没事，获取行就不行了！！！)
+temp = temp.reset_index(drop = True)
+inplace=True 这种参数！！！
+*****************************************************************************
+
+
+
+
+
+
+
+
+1.关于sort时间的问题，那里出现了时间是负数的情况
+2.关于时间切片，应该+6还是+7呢？
+3.df[df[] == condicetion] 返回的都是dataframe，不会因为只有一个就变成series
+
+3.1但要注意reset
+
+！！！3.2返回是空的情况，集合是空的情况你有没有考虑到code是否还能正常运心？
+
+4.好像是没有注意term_id的问题！！！ 
+user_tag_value merge的时候应该限制term_id,发帖情况单独计算的时候在时间切片那一块有做学期的控制？
+user_tag_value中可能会出现重复用户！！！(要指定term_id)
+
+
+
+5.缩进是否有问题
+#缺失值（防止user_id中有缺失值）
+    full_user_id = full_user_id.replace(r'\N',np.nan)
+    full_user_id = full_user_id.replace('null',np.nan)
+    full_user_id['birthday'] = full_user_id['birthday'].replace(np.nan,'00000')
+    full_user_id = full_user_id.dropna()
+    dropna的 how 有any和all两种方法
+
+6.####moc_term里面总不至于还有一个缺失值吧（有的话从开始就gg了,一开始取的那些start_time这些总不能还有缺失吧？？？）
+
+7.对类型的关注！！！读入都是str？除了wda.csv?
+
+8.列名一样不能concat!!!可以的，语法搞错了！(而且不同于merge的是重复列名不自动改名，所以列索引可能会坑)
+    pd.concat[[a,b],axis = 1]
+
+9.及时赋值！！！append dropna
+    reset_index 
+    set_index
+
+#这个不行
+data = data.set_index(data[time_tag])
+#要这样
+data = data.set_index([time_tag])
+
+ 别忘了搞清楚谁做索引！！！
+
+10.填充的时间，转化的时间是否都满足10位数？(感觉test那里没有？？？/1000？ //1000)
+    avg_gap有点大
+
+
+11.在time分割前有一个时间顺序，但是后续没有了
+   关于排序，尤其是计算时间？
+   每个用户userdata应该要排序？？？？（dataframe）
+   groupby之后的先后顺序？
+#时间数据在函数(timesplit)内有进行过排序？所以在计算特征的时候同一个actions里面的东西应该也是排序好了的？（添加顺序就是排序过的？）
+为什么有负值？
+
+12.逻辑问题：时间的计算确实是有问题的，比如两次视频活动之间插入了作业，会被认为一直在看视频，因为分在了不同的action的记录中
+
+13.要先生成一个wda.csv
+
+
+14 group 的坑挺多，顺序是按照group列的字典顺序来排的，而index是沿用原来的，所以reset_index一番比较好
+>>> for group in grouped:
+    ...     print(group[1])
+    ... 
+            one              two  three four
+    0  0.557201   0.793781955386  100.0    a
+    1  0.296827  -0.103058242424  233.0    a
+    2  0.217862    1.23589104471   55.5    a
+            one              two           three four
+    3 -2.161757  -0.593934824788  123213231232.0    b
+    4 -0.979632     1.3119615936     343433433.0    b
+
+15.在定义类中的函数时，一定要把self作为参数！！！！！
+   使用init中的定义的属性时别忘了加self！！
+
+16.此问题已经解决但是原因搞不清
+
+！！！32.话说还没测试过这个问题呢！！！
+类型上的问题？
+uid                  object
+total_time          float64
+uni_test             object
+sub_test             object
+avg_sub_test         object
+max_time            float64
+total_video_time    float64
+total_other_time    float64
+avg_gap              object
+dtype: object
+
+uid      object
+label    object
+dtype: object
+(用int去创建dataframe时出了问题，可能因为一部分返回值是int,一部分是float所以只能用str了？)
+全变成float?
+
+now:
+total_time          float64
+uni_test            float64
+sub_test              int64
+avg_sub_test        float64
+max_time            float64
+total_video_time    float64
+total_other_time    float64
+avg_gap             float64
+
+17.
+
+
+

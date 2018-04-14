@@ -1,0 +1,53 @@
+id太多了，改名！感觉合并的时候应该都要加上term_id保险一点（如果有的话）
+
+用户发帖情况：user_tag_value与moc_post, left: user_id term_id   right: poster_id term_id
+            course_id应该都是同一个
+
+            
+用户发帖被回复情况: user_tag_value与moc_post合并之后，加上moc_reply
+
+                 是否就是上文的count_reply?
+
+                 left = id(moc_post)  right = post_id
+                 时间信息：创建时间，term_id
+                 还有什么特征可以用：被回复的内容也有（可以记录长度）
+
+自己发的帖子被comment的情况？？？从reply中获得？？？
+
+用户自主回复(reply)他人帖子的情况: user_tag_value与moc_reply, left: user_id  right: replyer_id
+                        时间信息:创建时间，term_id,reply_time
+                        还有什么特征可以用:content(内部截取长度)，count_vote,count_comment??,tag_agree,tag_top,tag_top_time
+
+用户的reply被comment的情况：user_tag_value与moc_reply合并之后，加上moc_comment
+（自己评论自己？）          left = id(moc_rely) right = reply_id （其实还有post_id，但用不上）
+                         时间信息:创建时间，term_id，comment_time
+                         还有什么特征可以用:content(长度) count_vote tag_agree tag_top tag_top_time
+
+用户发布comment的情况:
+        user_tag_value 和 moc_comment合并 left = user_id  right = commertor_id
+        时间特征:创建时间，term_id，comment_time
+        还有什么特征可以用:content(长度) count_vote???
+
+
+用户参与作业（互评）的情况
+        user_tag_value 和 moc_mutual_evaluate合并  left = user_id  right = evaluator_id
+        时间特征：创建时间，
+        test_id!!!!和test表连接了！！！
+        其他有用特征：answerform_id?? origin_score? evaluate_judge_type
+用户参与作业互评的细节
+        test_id!靠这个和 （user_tag_value 和 moc_mutual_evaluate）组成的表连起来 
+        时间：test_id，创建时间
+        其他有用的特征：evaluate？？？
+
+用户自己的作业被评价的情况：
+        user_tag_value和moc_mutaual_evaluate连接 ；eft = user_id right = test_answerer_id
+        时间特征：创建时间，
+        test_id!!!!和test表连接了！！！
+        其他有用特征：answerform_id?? origin_score? evaluate_judge_type
+    
+
+用户答题情况本质无人知晓？？？
+
+
+
+

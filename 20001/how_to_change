@@ -1,0 +1,60 @@
+重新生成wda.csv？？保险？
+除了wda.csv其他都是objetc吧，dataframe的话？
+！！！确保不叫user_id(你要提取的文件中的user_tag不能叫user_id)
+
+
+1.不同课的文件结构（名字和数量，层次）应该是一样的
+2.不同学期！ 不同特征 是一些变量！
+3.有些变量名应该改一下的(在full中)
+4.有些文件可以不重复读取的
+user_tag_value(先course_id再term_id)
+moc_test(没毛病)
+moc_term(没毛病)
+
+但是user_tag_value封装在函数中了，必须读取重复读取了
+moc_test同理
+moc_term的话则可以不重复读取，但是又不大，重复读省的出错还能凑代码量
+
+5.不同学期
+test_course = course_data.ix[1]
+
+6.特征不同，变量名最好也更改一番
+#先打开并合并出要提取特征的dataframe(包含的是所有学期的数据)
+post_path = 'moc_post'
+post_name = '000000_0'
+p_delim = '\x01'
+post_data = read_data(post_path, post_name, p_delim)
+post_column = ['id','gmt_create','gmt_modified','type','lesson_unit_id','forum_id','root_forum_id','term_id','poster_id','post_time','title','last_replyer','last_reply_time','anonymous','tag_agree','tag_top','tag_top_time','tag_solve','tag_lector','count_browse','count_reply','count_vote','deleted','active_flag','lock_flag']
+post_data = get_dataframe(post_data, post_column)
+post_extract_column = ['poster_id','post_time']
+post_data = post_data[post_extract_column]
+time_tag = 'post_time'
+
+
+
+7.反省:
+user_tag = 'poster_id'
+user_feature = Usersplit_times(timeseries,user_tag)
+user_label, user_feature = log_Usersplit_feature(timeseries,user_tag,term_id,time_tag)#term_id给test用
+
+确实不需要！！！不必反省！！！
+
+8.更改函数？
+
+timepiece.reset_index(drop = True)
+#groupby
+timepiece = timepiece.groupby([usertag]).size()
+#timepiece是一个series,index是usertag对应的值！(方便concat)
+timepiece = timepiece.reset_index()#series转变为dataframe
+user_feature.append(timepiece)
+
+这个基础还是建立在size大法，以及sizw的话reset_index后只有两列,且user_tag的这个列名还是保留的
+(所以之后直接)
+
+！！！9.concat之后有重复列名的坑！
+
+
+
+
+
+
