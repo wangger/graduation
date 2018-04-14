@@ -1,0 +1,111 @@
+！！！！？？？？查看每列unique值很重要！
+len测的是unique的长度吗？
+
+user_value_tag
+    10001这门课：55591
+    用户总数：
+    学期数：
+    有1144人是在8.10还登陆过mooc
+    重复的nickname和user_id???
+    3类性别2333333，怕是有缺失值？如何判断？如何处理？都说是non-null的，所以是用什么去表示了呢？
+    如何输出每列unique的值有哪些？？？？？？
+    学期数是一样的，都是10001！！！？？？感觉课程和学期好错乱了！标注错误？？？？
+    (基本可以认定是选了同一门课程的不同学期的学生!)
+    2015.2.6选课的人数最多
+    所以有几个学期的话可以在这里面找？？？（2？）
+    重复的话应该是这个人选了多次课还是啥的吗？？？？(有人重复乱搞？)
+
+moc_post
+
+列名：'id','gmt_create','gmt_modified','type','lesson_unit_id','forum_id','root_forum_id','term_id','poster_id','post_time','title','last_replyer','last_reply_time','anonymous','tag_agree','tag_top','tag_top_time','tag_solve','tag_lector','count_browse','count_reply','count_vote','deleted','active_flag','lock_flag'       
+
+时间：帖子在哪个论坛，那个unit下是可见的！ 不同的学期！！
+总数：185，帖子id都不一样
+root_forum貌似没有？均为-1 。forum_id共6种？
+目测两个学期
+
+？？？三大时间还没搞（目测创建和post是同一个时间）
+title有个别会重合
+anonymous就3种值（0是没有）
+tag系列去看看学长注释！！！
+
+浏览数！！！！
+deleted全0，active_flag全1，lock_flag num(0) = 103 num(1) = 82?
+
+moc_post_detail
+列名：'id','gmt_create','gmt_modified','content'
+总数：185 为啥有16个为空……
+
+moc_reply
+列名：
+到底丢失了哪一列？？？？content!
+总数 896
+deleted,tag_agree,tag_top,tag_top_time,active_flag全都一个值
+
+moc_comment
+总数 244
+deleted tag_agree tag_top tag_top_time active_flag全都一个值
+
+moc_mutual_evaluate
+列名：'id','gmt_create','gmt_modified','evaluator_id','test_answerer_id','test_id','answerform_id','status','orig_score','evaluate_judge_type'
+总数  6109
+orig_score为啥是0最多？？？test id的话有20个（有互评记录的test？？？）
+answerform_id??
+status??
+
+moc_mutual_evaluate_detail
+列名：'id','gmt_create','gmt_modified','test_id','evaluate'     			
+总数：6109
+
+辅助的表
+moc_course
+总数：1？
+列名:'id','gmt_create','gmt_modified','name','school_id','status','current_term_id','start_time','duration','end_time','first_publish_time','course_load','big_photo','short_name','video_id','train_id','web_visible','weight','mode','channel','from_course_id','support_oj',             'previous_courses','from_course_mode','origin_copy_right_course_id','apply_mooc_status','current_term_chargeable'     
+有一些重要信息！！！
+开始时间：1425261600000
+结束时间：1437406200000
+持续时间：10  ??10周?
+当前的学期：253002
+时间戳???
+course_load:3-5h/w
+短名类似代号
+???
+weight（0） mode（0） channel from_course_id support_oj previous_courses from_course_mode origin_copy_right_course_id apply_mooc_status（目测都没啥用）
+
+train_id是互评训练id，对应测试表？？？
+
+moc_term
+总数：？
+列名: 'id','gmt_create','gmt_modified','course_id','start_time','duration','end_time','publish_status','small_photo','big_photo','course_load','first_publish_time','close_visable_status','web_visible','achievement_status','term_no','chargeable_cert','achievement_confirmed_time','time_to_freeze',   'mode','from_term_id','school_id','password','qualified_count','excellent_count','enroll_count','delta_start','delta_end','weight_total','weight_starting','weight_started','weight_finished','origin_copy_right_term_id','apply_mooc_status','from_term_mode','uniform_combo_score','mob_uniform_combo_score','copied','copy_time','price'
+两个学期：9003，253002!
+这些学期的开始时间，结束时间，持续时间都是有的！（同一门课持续时间不同是可能的！）
+id就是term id!!!
+term_no貌似没用？？
+
+成绩是否可以确认？？？
+achievement_status
+achievement_confirmed_time
+
+moc_lesson
+数量：38
+列名: 'id','gmt_create','gmt_modified','name','position','release_time','term_id','chapter_id','content_type','content_id'
+
+'content_type','content_id'????
+几节普通课，几节作业？
+
+（lesson）id都不同，chapter_id只有20个，有些课在讲同一个chapter?
+
+moc_lesson_unit
+总数：134
+列名：'id','gmt_create','gmt_modified','name','position','lesson_id','chapter_id','term_id','content_type', 'content_id','json_content' 
+
+lesson_id——20个
+chapter_id——20个
+
+moc_test
+整体信息！test是否exam,exam中的位置，对应什么章节！（但不是个体信息）
+总数： 
+列名：
+moc_exam
+总数：
+列名：
