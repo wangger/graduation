@@ -50,6 +50,7 @@ sum,size的话key是nan是不记录在内的吗？
             left: id  right: id  how = 'inner'
 
             feature(merge之后需要选中的列):
+
             ？？poster_id有缺失值呢？？？(在sum或者size的时候不会被计算进去？？？)
             poster_id(groupby), post_time,content
 
@@ -178,10 +179,12 @@ sum,size的话key是nan是不记录在内的吗？
 
             groupby method:size
 
+
             #待定？？？
             14.评价内容的总长度
             moc_mutual_evaluate 与 moc_test(merge之后按照term_id挑选出dataframe)
             left:test_id    right:id     how = 'inner'
+
 
             table:moc_mutual_evaluate(之前merge好的) 与moc_mutaul_evaluate_detail合并
             left:id    right:id        how = 'inner'

@@ -6,7 +6,7 @@ from data_test5 import get_dataframe, read_data
 from feature_extraction_1 import Valuefilling, Timesplit, Usersplit_times, Userfeature_Process, feature_concact, week_concact, get_listdata, w_list_txt
 
 
-
+#用户发帖数
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_colwidth', 500)
@@ -18,7 +18,6 @@ print(dt)
 '''
 
 print("test1 start:")
-#尝试生成log特征
 #前期准备工作
 #提取term_id，对应的开始时间和结束时间，duration
 f_path = 'moc_term'
@@ -29,13 +28,13 @@ course_column = ['id','gmt_create','gmt_modified','course_id','start_time','dura
 course_data = get_dataframe(course_data,course_column)
 extract_column = ['id','course_id','start_time','end_time','duration']#id即term_id
 course_data = course_data[extract_column]
-#print(course_data)
-#print(course_data.dtypes)
+print(course_data)
+print(course_data.dtypes)
 #测试可知有5个学期，每个学期持续的时间并不一样，然后id和course_id在这个表中没有乱，并且所有数据都是object(时间和duration都是str)
 #一门课有不同的学期，针对一个学期的数据进行单独预测
 #尝试采用第二学期的数据即可
 test_course = course_data.ix[1]
-#print(test_course)
+print(test_course)
 #都是str
 term_id = test_course['id']
 start_time = test_course['start_time']
@@ -65,8 +64,9 @@ post_data = post_data.replace('',np.nan)
 post_data = Valuefilling(post_data,['post_time'],[[np.nan]],[['1653192600000']])
 #删除有缺失值的行(不知道poster_id的行)
 post_data = post_data.dropna(axis = 0)
-#print (post_data.isnull().any())
-#print(post_data[post_data.isnull().values == True])
+print(post_data.ix[0])
+print (post_data.isnull().any())
+print(post_data[post_data.isnull().values == True])
 
 time_tag = 'post_time'
 
@@ -82,8 +82,8 @@ for timepiece in timeseries:
     print(timepiece.dtypes)
     print(timepiece.describe())
     print(timepiece.ix[0])
-    print(timepiece.ix[1])
-    print(timepiece.ix[-1])
+    #print(timepiece.ix[1])
+    #print(timepiece.ix[-1])
 
 #用户切割(size())
 #timeseries中应该是没有什么nan了的！

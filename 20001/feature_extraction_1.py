@@ -6,6 +6,7 @@
 3.将所有的time_data拼接起来的函数？
 '''
 
+
 import time
 from datetime import datetime,timedelta
 import numpy as np
@@ -133,7 +134,7 @@ def Timesplit(data,start_time,end_time,duration,time_tag,time_last = 7,time_proc
     if time_process:
         data[time_tag] = data[time_tag].map(lambda x : datetime.fromtimestamp(x//1000))
     #1.根据time_tag，将time_tag那一列设置成索引
-    data = data.set_index(data[time_tag])
+    data = data.set_index([time_tag])
     #（a.set_index(['timeset']),a['timeset']可以是str，但是不太好，因为索引类型时str不是datetime，可能并不方便一些切片操作）
     #2.是可以将time_tag这种index进行排序吧？(升序)
     data = data.sort_index()
@@ -174,11 +175,31 @@ def Usersplit_times(timeseries,usertag):
     user_feature = []
     #对于每个dataframe进行单独处理(索引是time)
     for timepiece in timeseries:
-        #去除时间索引吧
-        timepiece.reset_index(drop = True)
+        #去除时间索引吧(赋值！)
+        timepiece = timepiece.reset_index(drop = True)
         #groupby
         timepiece = timepiece.groupby([usertag]).size()
-        #timepiece是一个series,index是usertag对应的值！(方便concat)
+        timepiece = timepiece.reset_index()#series转变为dataframe
+        user_feature.append(timepiece)
+    return user_feature
+
+def Usersplit_sum(timeseries,usertag,sum_tag):
+    #!!!暂时只是统计的次数！
+    #timeseries为list,element是dataframe
+    #!!!!timeseries中应该确保没有nan(不能因为一些莫名其妙的属性来影响该列的存在，不利于size的计算)
+    #usertag(str):用于groupby的那一列的列名(表明用户身份)
+    #sum_tag:用于计算sum的那一列(str)
+
+    #返回值
+    #user_feature:含有用户特征(times)的一个list<dataframe>，是返回值(索引不是user_id)
+    user_feature = []
+    #对于每个dataframe进行单独处理(索引是time)
+    for timepiece in timeseries:
+        #去除时间索引吧(赋值！)
+        timepiece = timepiece.reset_index(drop = True)
+        #groupby        
+        #timepiece = timepiece.groupby([usertag]).size()
+        timepiece = timepiece.groupby([usertag])[sum_tag].sum()
         timepiece = timepiece.reset_index()#series转变为dataframe
         user_feature.append(timepiece)
     return user_feature

@@ -114,7 +114,7 @@ f_name = '000000_0'
 info = read_data(f_path,f_name, '\x01')
 print("the number of elements in each record : %d " % len(info))
 print(info[0])
-col_name = ['id', 'gmt_create', 'gmt_modified', 'commentor_id', 'anonymous', 'post_id', 'reply_id', 'count_vote', 'comment_tiem', 'deleted', 'tag_agree', 'tag_top', 'tag_top_time', 'active_flag', 'forum_id', 'term_id']
+col_name = ['id', 'gmt_create', 'gmt_modified', 'commentor_id', 'anonymous', 'post_id', 'reply_id', 'count_vote', 'comment_time', 'deleted', 'tag_agree', 'tag_top', 'tag_top_time', 'active_flag', 'forum_id', 'term_id']
 info = get_dataframe(info,col_name)
 #查看数据大致信息
 print(info.describe())
@@ -164,6 +164,7 @@ print(post_infos.dtypes)
 print(post_infos.info())
 print('*************************************')
 '''
+'''
 print('test6 start: moc_course')
 f_path = 'moc_course'
 f_name = '000000_0'
@@ -181,7 +182,7 @@ print(info.describe())
 print(info.dtypes)
 print(info.info())
 print('*************************************')
-
+'''
 
 '''
 print('test7 start: moc_term')
@@ -277,3 +278,16 @@ print(info.info())
 print('*************************************')
 
 '''
+print('test10 start: moc_test')
+f_path = 'moc_test'
+f_name = '000000_0'
+info = read_data(f_path,f_name,'\01')
+col_name = ['id', 'gmt_create', 'gmt_modified', 'release_time', 'name', 'description', 'test_time', 'trytime', 'analyse_setting', 'test_random_setting', 'type', 'term_id', 'chapter_id', 'deadline', 'subjective_total_score', 'objective_total_score', 'submit_test_count', 'score_pub_status', 'avg_score', 'exam_id', 'position_in_exam', 'oj_question_trytime', 'is_random']
+# 'id', 'gmt_create', 'gmt_modified', 'release_time', 'name,description', 'test_time', 'trytime', 'analyse_setting', 'test_random_setting', 'type,term_id', 'chapter_id', 'deadline', 'subjective_total_score', 'objective_total_score', 'submit_test_count', 'score_pub_status', 'avg_score', 'exam_id','position_in_exam', 'oj_question_trytime', 'is_random' 
+info = get_dataframe(info,col_name)
+#查看数据大致信息
+print(info.ix[0])
+print(info.describe())
+print(info.dtypes)
+print(info.info())
+print('*************************************')
